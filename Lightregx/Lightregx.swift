@@ -43,15 +43,15 @@ public extension Lightregx {
     
     struct Result {
         
-        let string: String
-        let groups: [String]
+        public let string: String
+        public let groups: [String]
         
         init(string: String, groups: [String] = []) {
             self.string = string
             self.groups = groups
         }
     }
-
+    
     /// Checks if the regular expression matches a string.
     ///
     /// - Parameter string: A string to be matchd.
@@ -66,7 +66,7 @@ public extension Lightregx {
     /// the grouping information in the regular expression
     ///  For example:
     ///
-    ///     let regx = Lightregx(regx: "(\\d{3})-(\\d{3,8})")!
+    ///     let regx = Lightregx("(\\d{3})-(\\d{3,8})")!
     ///     let res = regx.fetchAll(in: "Tel: 010-12345 & 027-12345678")
     ///
     ///     print(res.map { $0.string })
@@ -77,11 +77,13 @@ public extension Lightregx {
     ///
     /// - Parameter string: A string to be matchd.
     /// - Returns: An Array type objcet.
-    func fetchAll(in string: String) -> [Result] {
+    func fetchAll(in string: String) -> [Result]? {
         
         let range = NSRange(location: 0, length: string.count)
-        return regexp.matches(in: string, options: [], range: range).map({ (result) -> Result in
-            let matchText = string[Range(result.range)!]!.string
+        let res = regexp.matches(in: string, options: [], range: range).compactMap({ result -> Result? in
+            guard let range = Range(result.range), let matchText = string[range]?.string, !matchText.isEmpty else {
+                return nil
+            }
             let groups = (0..<result.numberOfRanges).reduce([], { (res, idx) -> [String] in
                 if idx > 0, let text = string[Range(result.range(at: idx))!]?.string, !text.isEmpty {
                     return res + [text]
@@ -91,6 +93,7 @@ public extension Lightregx {
             
             return Result(string: matchText, groups: groups)
         })
+        return res.isEmpty ? nil : res
     }
     
     /// Maby you just wanna get the first result. This method will help
@@ -103,11 +106,11 @@ public extension Lightregx {
         
         let range = NSRange(location: 0, length: string.count)
         guard let result = regexp.firstMatch(in: string, options: [], range: range) else { return nil }
-        let matchText = string[Range(result.range)!]!.string
-        
+        guard let r = Range(result.range), let matchText = string[r]?.string, !matchText.isEmpty else {
+            return nil
+        }
         let groups = (0..<result.numberOfRanges).reduce([], { (res, idx) -> [String] in
-            if idx > 0 {
-                let text = string[Range(result.range(at: idx))!]!.string
+            if idx > 0, let text = string[Range(result.range(at: idx))!]?.string, !text.isEmpty {
                 return res + [text]
             }
             return res
@@ -122,7 +125,7 @@ public extension Lightregx {
     /// you can do this:
     ///
     ///     let text = "I bought this pair of shoes for $50 this afternoon at 3pm."
-    ///     let regx = Lightregx(regx: "\\d")!
+    ///     let regx = Lightregx("\\d")
     ///     let res = regx.replace(in: text, using: "*")
     ///     print(res)
     ///     /// Prints: "I bought this pair of shoes for $** this afternoon at *pm."
@@ -143,12 +146,12 @@ public extension Lightregx {
     /// may want to do some extra operations on the matched string, such as
     /// doubling the number in a string. Now you can do this thing simply:
     ///
-    ///     let regx = Lightregx(regx: "\\d")!
+    ///     let regx = Lightregx("\\d")
     ///     let res = regx.replace(in: "A1B23C45D678E") { "\(Int($0)! * 2)" }
     ///     print(res)
     ///     /// Prints: "A2B46C810D121416E"
     ///
-    ///     let regx = Lightregx(regx: "\\d+")!
+    ///     let regx = Lightregx("\\d+")
     ///     let res = regx.replace(in: "A1B23C45D678E") { "\(Int($0)! * 2)" }
     ///     print(res)
     ///     /// Prints: "A2B46C90D1356E"
