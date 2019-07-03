@@ -5,7 +5,6 @@
 //  Created by Wayne on 2018/6/26.
 //  Copyright © 2018年 Wayne. All rights reserved.
 //
-
 import Foundation
 
 
@@ -85,7 +84,7 @@ public extension Lightregx {
                 return nil
             }
             let groups = (0..<result.numberOfRanges).reduce([], { (res, idx) -> [String] in
-                if idx > 0, let text = string[Range(result.range(at: idx))!]?.string, !text.isEmpty {
+                if idx > 0, let text = string[Range(result.range(at: idx))!]?.string {
                     return res + [text]
                 }
                 return res
@@ -110,7 +109,7 @@ public extension Lightregx {
             return nil
         }
         let groups = (0..<result.numberOfRanges).reduce([], { (res, idx) -> [String] in
-            if idx > 0, let text = string[Range(result.range(at: idx))!]?.string, !text.isEmpty {
+            if idx > 0, let text = string[Range(result.range(at: idx))!]?.string {
                 return res + [text]
             }
             return res
