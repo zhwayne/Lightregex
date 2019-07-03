@@ -18,19 +18,15 @@ import Foundation
 public struct Lightregx {
     
     /// The regular expression string.
-    public let regx: String
+    public var regx: String {
+        return regexp.pattern
+    }
     
     private let regexp: NSRegularExpression
     
-    public init?(regx: String) {
-        
-        self.regx = regx
+    public init?(_ regx: String) {
         let options: NSRegularExpression.Options = [.dotMatchesLineSeparators, .anchorsMatchLines]
-        guard let exp = try? NSRegularExpression(pattern: regx, options: options) else {
-            return nil
-        }
-        
-        regexp = exp
+        regexp = try! NSRegularExpression(pattern: regx, options: options)
     }
 }
 
@@ -39,13 +35,13 @@ extension Lightregx: ExpressibleByStringLiteral {
     public typealias StringLiteralType = String
     
     public init(stringLiteral value: StringLiteralType) {
-        self.init(regx: value)!
+        self.init(value)!
     }
 }
 
 public extension Lightregx {
     
-    public struct Result {
+    struct Result {
         
         let string: String
         let groups: [String]
@@ -60,7 +56,7 @@ public extension Lightregx {
     ///
     /// - Parameter string: A string to be matchd.
     /// - Returns: Return true if match a string.
-    public func match(in string: String) -> Bool {
+    func match(in string: String) -> Bool {
         
         let range = NSRange(location: 0, length: string.count)
         return !regexp.matches(in: string, options: [], range: range).isEmpty
@@ -81,14 +77,13 @@ public extension Lightregx {
     ///
     /// - Parameter string: A string to be matchd.
     /// - Returns: An Array type objcet.
-    public func fetchAll(in string: String) -> [Result] {
+    func fetchAll(in string: String) -> [Result] {
         
         let range = NSRange(location: 0, length: string.count)
         return regexp.matches(in: string, options: [], range: range).map({ (result) -> Result in
             let matchText = string[Range(result.range)!]!.string
             let groups = (0..<result.numberOfRanges).reduce([], { (res, idx) -> [String] in
-                if idx > 0 {
-                    let text = string[Range(result.range(at: idx))!]!.string
+                if idx > 0, let text = string[Range(result.range(at: idx))!]?.string, !text.isEmpty {
                     return res + [text]
                 }
                 return res
@@ -98,13 +93,13 @@ public extension Lightregx {
         })
     }
     
-    /// Well, maby you just wanna get the first result. This method will help
+    /// Maby you just wanna get the first result. This method will help
     /// you.
     ///
     /// - Parameters:
     /// - Parameter string: A string to be matchd.
     /// - Returns: A Result type objcet.
-    public func fetchOne(in string: String) -> Result? {
+    func fetchOne(in string: String) -> Result? {
         
         let range = NSRange(location: 0, length: string.count)
         guard let result = regexp.firstMatch(in: string, options: [], range: range) else { return nil }
@@ -124,7 +119,7 @@ public extension Lightregx {
     
     /// This method replaces the matched substring with a template string.
     /// For example, I want to replace all the numbers in a string with `*`, and
-    /// I can do this:
+    /// you can do this:
     ///
     ///     let text = "I bought this pair of shoes for $50 this afternoon at 3pm."
     ///     let regx = Lightregx(regx: "\\d")!
@@ -136,7 +131,7 @@ public extension Lightregx {
     ///   - string: A string to be matchd.
     ///   - template: A template string.
     /// - Returns: New string.
-    public func replace(in string: String, using template: String) -> String {
+    func replace(in string: String, using template: String) -> String {
         
         let range = NSRange(location: 0, length: string.count)
         return regexp.stringByReplacingMatches(in: string, options: [], range: range, withTemplate: template)
@@ -162,7 +157,7 @@ public extension Lightregx {
     ///   - string: string: A string to be matchd.
     ///   - apply: A method for transform string.
     /// - Returns: New string.
-    public func replace(in string: String, apply: (String) -> String?) -> String {
+    func replace(in string: String, apply: (String) -> String?) -> String {
         
         let range = NSRange(location: 0, length: string.count)
         return regexp.matches(in: string, options: .reportProgress, range: range).reversed().reduce(string, { (str, result) -> String in
@@ -177,7 +172,7 @@ public extension Lightregx {
 
 fileprivate extension String {
     
-    fileprivate subscript(range: Range<Int>) -> Substring? {
+    subscript(range: Range<Int>) -> Substring? {
         guard let left = index(startIndex, offsetBy: range.lowerBound, limitedBy: endIndex) else { return nil }
         guard let right = index(left, offsetBy: range.upperBound - range.lowerBound, limitedBy: endIndex) else { return nil }
         return self[left..<right]
@@ -186,30 +181,30 @@ fileprivate extension String {
 
 fileprivate extension Substring {
     
-    fileprivate var string: String { return String(self) }
+    var string: String { return String(self) }
 }
 
 
 
 public extension String {
     
-    public func match(regx: String) -> Bool {
-        return Lightregx(regx: regx)?.match(in: self) ?? false
+    func match(regx: String) -> Bool {
+        return Lightregx(regx)?.match(in: self) ?? false
     }
     
-    public func fetchAll(regx: String) -> [String] {
-        return Lightregx(regx: regx)?.fetchAll(in: self).map { $0.string } ?? []
+    func fetchAll(regx: String) -> [Lightregx.Result]? {
+        return Lightregx(regx)?.fetchAll(in: self)
     }
     
-    public func fetchOne(regx: String) -> String? {
-        return Lightregx(regx: regx)?.fetchOne(in: self)?.string
+    func fetchOne(regx: String) -> Lightregx.Result? {
+        return Lightregx(regx)?.fetchOne(in: self)
     }
     
-    public func replace(regx: String, using template: String) -> String {
-        return Lightregx(regx: regx)?.replace(in: self, using: template) ?? self
+    func replace(regx: String, using template: String) -> String {
+        return Lightregx(regx)?.replace(in: self, using: template) ?? self
     }
     
-    public func replace(regx: String, apply: (String) -> String?) -> String {
-        return Lightregx(regx: regx)?.replace(in: self, apply: apply) ?? self
+    func replace(regx: String, apply: (String) -> String?) -> String {
+        return Lightregx(regx)?.replace(in: self, apply: apply) ?? self
     }
 }
