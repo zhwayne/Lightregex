@@ -1,7 +1,7 @@
 import XCTest
-@testable import Lightregx
+@testable import Lightregex
 
-final class LightregxTests: XCTestCase {
+final class LightregexTests: XCTestCase {
     func testExample() throws {
         // XCTest Documentation
         // https://developer.apple.com/documentation/xctest

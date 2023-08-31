@@ -4,7 +4,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "Lightregx",
+    name: "Lightregex",
     platforms: [
         .iOS(.v13),
         .macOS(.v11),
@@ -12,16 +12,16 @@ let package = Package(
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
-            name: "Lightregx",
-            targets: ["Lightregx"]),
+            name: "Lightregex",
+            targets: ["Lightregex"]),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "Lightregx"),
+            name: "Lightregex"),
         .testTarget(
-            name: "LightregxTests",
-            dependencies: ["Lightregx"]),
+            name: "LightregexTests",
+            dependencies: ["Lightregex"]),
     ]
 )
