@@ -7,8 +7,6 @@
 //
 import Foundation
 
-
-
 /// The regular expression module in iOS is very powerful, but it is also very
 /// difficult to use. If you want to implement a requirement, you may need to
 /// write a lot of obscure code. So, this framework is the encapsulation of
