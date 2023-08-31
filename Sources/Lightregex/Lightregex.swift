@@ -1,6 +1,6 @@
 //
-//  Lightregx.swift
-//  Lightregx
+//  Lightregex.swift
+//  Lightregex
 //
 //  Created by Wayne on 2018/6/26.
 //  Copyright © 2018 Wayne. All rights reserved.
@@ -11,7 +11,7 @@ import Foundation
 /// While the regular expression module in iOS is remarkably powerful, utilizing it can be quite intricate.
 /// Often, implementing even a basic requirement necessitates crafting convoluted code. To streamline the process,
 /// this framework encapsulates `NSRegularExpression`, aiming to simplify regular expression usage for developers.
-public struct Lightregx: Equatable {
+public struct Lightregex: Equatable {
     
     /// The regular expression pattern.
     public var pattern: String {
@@ -26,7 +26,7 @@ public struct Lightregx: Equatable {
     }
 }
 
-extension Lightregx: ExpressibleByStringLiteral {
+extension Lightregex: ExpressibleByStringLiteral {
     
     public typealias StringLiteralType = String
     
@@ -35,7 +35,7 @@ extension Lightregx: ExpressibleByStringLiteral {
     }
 }
 
-extension Lightregx {
+extension Lightregex {
     
     public struct Match: Equatable {
         
@@ -62,7 +62,7 @@ extension Lightregx {
     /// the captured groups based on the regular expression pattern.
     /// For instance:
     ///
-    ///     let regx = Lightregx("(\\d{3})-(\\d{3,8})")!
+    ///     let regx = Lightregex("(\\d{3})-(\\d{3,8})")!
     ///     let res = regx.wholeMatch(in: "Tel: 010-12345 & 027-12345678")
     ///
     ///     print(res.map { $0.string })
@@ -117,7 +117,7 @@ extension Lightregx {
     /// For example, to replace all numbers in a string with `*`, you can do the following:
     ///
     ///     let text = "I bought this pair of shoes for $50 this afternoon at 3pm."
-    ///     let regx = Lightregx("\\d")
+    ///     let regx = Lightregex("\\d")
     ///     let res = regx.replacing(in: text, with: "*")
     ///     print(res)
     ///     /// Prints: "I bought this pair of shoes for $** this afternoon at *pm."
@@ -135,12 +135,12 @@ extension Lightregx {
     /// Sometimes, you may require more complex operations on the matched substrings, such as doubling numbers in a string.
     /// This method facilitates such transformations:
     ///
-    ///     let regx = Lightregx("\\d")
+    ///     let regx = Lightregex("\\d")
     ///     let res = regx.replacing(in: "A1B23C45D678E") { "\(Int($0)! * 2)" }
     ///     print(res)
     ///     /// Prints: "A2B46C810D121416E"
     ///
-    ///     let regx = Lightregx("\\d+")
+    ///     let regx = Lightregex("\\d+")
     ///     let res = regx.replacing(in: "A1B23C45D678E") { "\(Int($0)! * 2)" }
     ///     print(res)
     ///     /// Prints: "A2B46C90D1356E"
@@ -187,23 +187,23 @@ extension String {
     /// - Parameter regex: The regular expression pattern to be checked.
     /// - Returns: Returns true if a match is found.
     public func contains(_ regex: String) -> Bool {
-        (try? Lightregx(regex).match(in: self)) ?? false
+        (try? Lightregex(regex).match(in: self)) ?? false
     }
     
     /// Retrieves all whole matching results based on the provided regular expression.
     ///
     /// - Parameter regex: The regular expression pattern to be matched.
     /// - Returns: An array of matching results, each containing the matched string and its groups.
-    public func wholeMatch(_ regex: String) -> [Lightregx.Match]? {
-        try? Lightregx(regex).wholeMatch(in: self)
+    public func wholeMatch(_ regex: String) -> [Lightregex.Match]? {
+        try? Lightregex(regex).wholeMatch(in: self)
     }
     
     /// Retrieves the first matching result based on the provided regular expression.
     ///
     /// - Parameter regex: The regular expression pattern to be matched.
     /// - Returns: The first matching result, if found.
-    public func firstMatch(_ regex: String) -> Lightregx.Match? {
-        try? Lightregx(regex).firstMatch(in: self)
+    public func firstMatch(_ regex: String) -> Lightregex.Match? {
+        try? Lightregex(regex).firstMatch(in: self)
     }
     
     /// Replaces substrings that match the provided regular expression with the specified replacement string.
@@ -213,7 +213,7 @@ extension String {
     ///   - replacement: The template string for replacements.
     /// - Returns: The modified string with replacements.
     public func replacing(_ regex: String, with replacement: String) -> String {
-        let str = try? Lightregx(regex).replacing(in: self, with: replacement)
+        let str = try? Lightregex(regex).replacing(in: self, with: replacement)
         return str ?? self
     }
     
@@ -224,7 +224,7 @@ extension String {
     ///   - apply: A closure that takes a matched substring and returns a transformed string.
     /// - Returns: The modified string with applied transformations.
     public func replacing(_ regex: String, transform apply: (String) -> String?) -> String {
-        let str = try? Lightregx(regex).replacing(in: self, transform: apply)
+        let str = try? Lightregex(regex).replacing(in: self, transform: apply)
         return str ?? self
     }
 }
